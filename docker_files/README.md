@@ -2,11 +2,11 @@
 
 The Dockerfile here is used to create an environment where Horovod can be used with Pytorch.
 
-Software versions have been fixed for my convenience. 
+Software versions have been fixed for Python, Pytorch, etc. for my convenience. 
 
 However, they can be changed manually.
 
-The current installation uses pip instead of Anaconda.
+Also, the current installation uses pip instead of Anaconda.
 
 This is keeping with the original Dockerfile in Horovod.
 
@@ -15,7 +15,7 @@ for the original.
 
 ### Dependencies and installation
 
-The section before `pip install ...` is boilerplate for dependencies on Ubuntu.
+The section before `pip install [...]` is boilerplate for dependencies on Ubuntu.
 
 The current project only uses Pytorch, Torchvision, Tensorboard, Numpy, and typing.
 
@@ -25,7 +25,7 @@ Pytorch and Torchvision are installed with their wheel directories in PyPI for f
 
 See [here](https://download.pytorch.org/whl/cu100/torch_stable.html) for Pytorch wheels for CUDA10.0.
 
-Other project requirements should be installed here.
+Other project requirements should be installed by including them in the `pip install [...]` line.
 
 ### Horovod installation
 
@@ -36,7 +36,7 @@ HOROVOD_GPU_ALLREDUCE=NCCL,
 HOROVOD_GPU_BROADCAST=NCCL, and 
 HOROVOD_WITH_PYTORCH=1.
 
-The first two indicate that GPU operations should use NCCL (pronounced "nickel").
+The first two indicate that GPU operations should use [NCCL](https://github.com/NVIDIA/nccl) (pronounced "nickel").
 
 This setting is crucial for performance.
 

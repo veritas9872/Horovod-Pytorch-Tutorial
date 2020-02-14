@@ -1,2 +1,3 @@
 set -ex
-horovodrun -np 2 -H localhost:2 python train/train_model.py
+N=2
+horovodrun -np $N -H localhost:$N python train/train_model.py

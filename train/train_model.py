@@ -15,9 +15,8 @@ import horovod.torch as hvd
 def main():
     model: nn.Module = resnet34(num_classes=10).cuda()
 
-    # print('Number of threads: ', torch.get_num_threads(), torch.get_num_interop_threads())
-
-    batch_size = 1024
+    # Set variables here. These are just for demonstration so no need for argparse.
+    batch_size = 1024  # This is the true min-batch size, thanks to DistributedSampler.
     num_workers_per_process = 2  # Workers launched by each process started by horovodrun command.
     lr = 0.1
     momentum = 0.9
@@ -42,9 +41,7 @@ def main():
 
     loss_func = nn.CrossEntropyLoss()
 
-    # print('Thread number: ', torch.get_num_threads(), torch.get_num_interop_threads())
-
-    # Writing separate log files for each process. Verified that models are different.
+    # Writing separate log files for each process for comparison. Verified that models are different.
     writer = SummaryWriter(log_dir=f'./logs/{hvd.local_rank()}', comment='Summary writer for run.')
 
     # Optimizer must be distributed for the Ring-AllReduce.
@@ -68,7 +65,7 @@ def main():
 
     for epoch in range(num_epochs):
         print(epoch)
-        torch.autograd.set_grad_enabled = True
+        torch.autograd.set_grad_enabled = True  # Training mode.
         train_sampler.set_epoch(epoch)  # Set epoch to sampler for proper shuffling of training set.
         for inputs, targets in train_loader:
             inputs: Tensor = inputs.cuda(non_blocking=True)
@@ -81,7 +78,7 @@ def main():
             loss.backward()
             optimizer.step()
 
-        torch.autograd.set_grad_enabled = False
+        torch.autograd.set_grad_enabled = False  # Evaluation mode.
         for step, (inputs, targets) in enumerate(test_loader):
             inputs: Tensor = inputs.cuda(non_blocking=True)
             targets: Tensor = targets.cuda(non_blocking=True)
@@ -89,7 +86,7 @@ def main():
             loss = loss_func(outputs, targets)
             writer.add_scalar(tag='val_loss', scalar_value=loss.item(), global_step=step)
 
-        scheduler.step()
+        scheduler.step()  # Scheduler works fine on DistributedOptimizer.
 
 
 if __name__ == '__main__':
@@ -105,5 +102,5 @@ if __name__ == '__main__':
     print(f'Local Rank: {hvd.local_rank()}')
 
     # Set default to each GPU device. Local rank is different for each process launched by horovodrun.
-    with torch.cuda.device(f'cuda:{hvd.local_rank()}'):
-        main()
+    with torch.cuda.device(f'cuda:{hvd.local_rank()}'):  # Not sure if this is absolutely necessary.
+        main()  # Run main function for each process on different devices, specified by "local_rank".

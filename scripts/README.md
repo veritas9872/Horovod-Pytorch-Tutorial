@@ -12,6 +12,8 @@ Each script and its contents are explained here.
 
 Build the Docker image with the docker_build_script.
 
+Please read the README file attached with the Dockerfile for an explanation of its contents.
+
 The -t indicates the tag/name. The format is (repository):(tag).
 
 The full path to the Dockerfile must be specified.
@@ -98,7 +100,7 @@ This is specified by the `num_workers` variable.
 
 However, each Horovod process will launch these workers independently.
 
-This may cause an excessive number of workers to be launched. 
+The true number of pre-processing workers will therefore be `np x num_workers`.
 
 **2. Host**
 
@@ -106,7 +108,7 @@ The `-H` flag specifies the host type.
 
 The number of GPUs to be used is specified on the right.
 
-N must be the same or lesser than the number of GPUs.
+N must be the same or lesser than the number of available GPUs.
 
 For a local machine where N GPUs are to be used, use "localhost:N".
 
@@ -116,13 +118,13 @@ For servers, a different scheme is used.
 
 For server with index I with N GPUs, use "serverI:N".
 
-For large servers, use a hostfile.
+For large servers, use a hostfile with the server information.
 
 **3. Autotune**
 
-Use the `--autotune` flag to autotune parameters for best performance.
+Use the `--autotune` flag to autotune parameters for best speed performance.
 
-Autotuning uses Bayesian optimization for finding the best parameters.
+Autotuning uses Bayesian optimization for finding the best parameters for speed.
 
 This will cause early runs to be slower, but later runs will be faster.
 
